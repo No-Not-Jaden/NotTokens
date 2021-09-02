@@ -1,6 +1,6 @@
-name: VytherTokens
+name: NotTokens
 version: ${project.version}
-main: me.jadenp.vythertokens.VytherTokens
+main: me.jadenp.nottokens.NotTokens
 api-version: 1.17
 authors: [ Not_Jaden ]
 description: A simple tokens system
