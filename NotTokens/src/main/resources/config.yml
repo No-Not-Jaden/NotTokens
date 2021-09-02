@@ -1,0 +1,11 @@
+# Language
+prefix: '&7[&b&lNot&d&lTokens&7] &8➟ &r'
+balance: '&aYou have {tokens} tokens.'
+admin-add: '&aYou have given {player} {tokens} tokens.'
+player-receive: '&aYou have received {tokens} tokens.'
+admin-remove: '&aYou have removed {tokens} tokens from {player}.'
+player-take: '&a{tokens} tokens have been removed from your account.'
+unknown-command: '&cUnknown Command! /token help'
+unknown-player: '&cUnknown Player!'
+
+# Placeholder: %nottokens_amount%
