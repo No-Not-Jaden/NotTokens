@@ -5,4 +5,5 @@ Stores token amounts in a hashmap while the server is running and auto saves to 
 Also has a log of when and who gets tokens if there are any concerns about token balances.
 In the config you can change the language as needed.
 Includes a Placeholder from [PlaceholderAPI](https://www.spigotmc.org/resources/placeholderapi.6245/), but not required. *%nottokens_amount%* 
+| [Spigot Page](https://www.spigotmc.org/resources/nottokens.95946/)
 
