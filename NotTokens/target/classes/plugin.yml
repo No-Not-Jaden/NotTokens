@@ -1,5 +1,5 @@
 name: NotTokens
-version: 1.1
+version: 1.2
 main: me.jadenp.nottokens.NotTokens
 api-version: 1.17
 authors: [ Not_Jaden ]
@@ -15,6 +15,6 @@ commands:
       - nottokens
       - ntokens
 permissions:
-  vythertokens.admin:
+  nottokens.admin:
     description: ability to add and remove tokens
     default: op

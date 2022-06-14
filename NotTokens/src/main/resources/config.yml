@@ -1,3 +1,7 @@
+# condense the tokens notifications to one message per given seconds
+# time in seconds (-1 to disable)
+condense-spam: 15
+
 # Language
 prefix: '&7[&b&lNot&d&lTokens&7] &8➟ &r'
 balance: '&aYou have {tokens} tokens.'
@@ -5,7 +9,16 @@ admin-add: '&aYou have given {player} {tokens} tokens.'
 player-receive: '&aYou have received {tokens} tokens.'
 admin-remove: '&aYou have removed {tokens} tokens from {player}.'
 player-take: '&a{tokens} tokens have been removed from your account.'
+admin-set: '&a{player} now has {tokens} tokens.'
+player-set: '&aYour tokens were set to {tokens}.'
 unknown-command: '&cUnknown Command! /token help'
 unknown-player: '&cUnknown Player!'
+reduced-message: '&aYour tokens have changed by {tokens} since {time} seconds.'
 
 # Placeholder: %nottokens_amount%
+
+# how many tokens are rewarded for killing a mob
+kill-rewards:
+  1:
+    name: zombie
+    amount: 1
