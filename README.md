@@ -1,4 +1,4 @@
-#NotTokens Overview
+# NotTokens Overview
 A simple tokens system for minecraft. Allows players with the proper permission to add or remove tokens from a player. Stores token amounts in the plugin while the server is running and auto saves to a file every couple of minutes. Also has a log of when and who gets tokens if there are any concerns about token balances.
 
 #PlaceholderAPI
