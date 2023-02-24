@@ -1,0 +1,86 @@
+# settings
+
+# MySQL connection - you don't have to change anything if you don't want to use it
+# must restart your server for MySQL changes to take effect
+database:
+  host: localhost
+  port: 3306
+  database: db
+  user: username
+  password: pass
+  use-ssl: false
+  # automatically move data stored locally to the MySQL database when one connects
+  migrate-local-data: true
+  # automatically try to connect to the database if a connection was lost
+  auto-connect: false
+
+# condense the tokens notifications to one message per given seconds
+# time in seconds (-1 to disable)
+condense-spam: 30
+# a list of players that are excluded from /tokens top
+# not case-sensitive
+leaderboard-exclusion:
+  - Not_Jaden
+
+# Language
+prefix: '&7[&b&lNot&d&lTokens&7] &8➟ &r'
+balance: '&aYou have {tokens} tokens.'
+admin-add: '&aYou have given {player} {tokens} tokens.'
+player-receive: '&aYou have received {tokens} tokens.'
+admin-remove: '&aYou have removed {tokens} tokens from {player}.'
+player-take: '&a{tokens} tokens have been removed from your account.'
+admin-set: '&a{player} now has {tokens} tokens.'
+player-set: '&aYour tokens were set to {tokens}.'
+unknown-command: '&cUnknown Command! /token help'
+unknown-player: '&cUnknown Player!'
+reduced-message: '&aYour tokens have changed by {tokens} in the last {time} seconds.'
+other-tokens: '&a{player} has {tokens} tokens.'
+admin-give-all: '&aYou have given {amount} players {tokens} tokens.'
+
+# Placeholder: %nottokens_amount%
+
+# how many tokens are rewarded for killing a mob
+kill-rewards:
+  enabled: false
+  1:
+    name: zombie
+    amount: 1
+  2:
+    name: skeleton
+    amount: 1
+  3:
+    name: spider
+    amount: 1
+  4:
+    name: witch
+    amount: 3
+  5:
+    name: creeper
+    amount: 1
+  6:
+    name: wither
+    amount: 500
+  7:
+    name: ender_dragon
+    amount: 500
+  8:
+    name: elder_guardian
+    amount: 500
+  9:
+    name: iron_golem
+    amount: 5
+  10:
+    name: wither_skeleton
+    amount: 2
+  11:
+    name: cave_spider
+    amount: 1
+  12:
+    name: drowned
+    amount: 2
+  13:
+    name: blaze
+    amount: 1
+  14:
+    name: zombified_piglin
+    amount: 1
