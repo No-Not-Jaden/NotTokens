@@ -36,17 +36,6 @@ public class MySQL {
         username = (plugin.getConfig().isSet("database.user") ? plugin.getConfig().getString("database.user") : "user");
         password = (plugin.getConfig().isSet("database.password") ? plugin.getConfig().getString("database.password") : "");
         useSSL = (plugin.getConfig().isSet("database.use-ssl") && plugin.getConfig().getBoolean("database.use-ssl"));
-        /*getLogger().info(host);
-        getLogger().info(port);
-        getLogger().info(database);
-        getLogger().info(username);
-        getLogger().info(password);
-        getLogger().info(useSSL + "");
-        host = "localhost";
-        port = "3306";
-        database = "jadenplugins";
-        username = "root";
-        password = "";*/
     }
 
     public boolean isConnected() {
@@ -74,49 +63,5 @@ public class MySQL {
         return connection;
     }
 
-    /*
 
-
-
-    private DataSource initMySQLDataSource() throws SQLException {
-        MysqlDataSource dataSource = new MysqlConnectionPoolDataSource();
-        // set credentials
-        dataSource.setServerName(plugin.getConfig().getString("database.host"));
-        dataSource.setPortNumber(plugin.getConfig().getInt("database.port"));
-        dataSource.setDatabaseName(plugin.getConfig().getString("database.database"));
-        dataSource.setUser(plugin.getConfig().getString("database.user"));
-        dataSource.setPassword(plugin.getConfig().getString("database.password"));
-        // Test connection
-        testDataSource(dataSource);
-        return dataSource;
-    }
-
-    private void testDataSource(DataSource dataSource) throws SQLException {
-        try (Connection conn = dataSource.getConnection()) {
-            if (!conn.isValid(1)) {
-                throw new SQLException("Could not establish database connection.");
-            }
-        }
-    }
-
-    private void initDb() throws SQLException, IOException {
-        String setup;
-        try (InputStream in = getClassLoader().getResourceAsStream("dbsetup.sql")){
-            setup = new BufferedReader(new InputStreamReader(in)).lines().collect(Collectors.joining("\n"));
-        } catch (IOException e){
-            getLogger().log(Level.SEVERE, "Could not read db setup file.", e);
-            throw e;
-        }
-        String[] queries = setup.split(";");
-        // execute each query to the database.
-        for (String query : queries) {
-            // If you use the legacy way you have to check for empty queries here.
-            if (query.isEmpty()) continue;
-            try (Connection conn = dataSource.getConnection();
-                 PreparedStatement stmt = conn.prepareStatement(query)) {
-                stmt.execute();
-            }
-        }
-        getLogger().info("§2Database setup complete.");
-    }*/
 }
