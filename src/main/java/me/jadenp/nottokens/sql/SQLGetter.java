@@ -145,7 +145,9 @@ public class SQLGetter {
             ps.setLong(1, 0L);
             return ps.executeUpdate();
         } catch (SQLException e){
-            reconnect();
+            if (reconnect()){
+                return removeExtraData();
+            }
             //e.printStackTrace();
         }
         return 0;

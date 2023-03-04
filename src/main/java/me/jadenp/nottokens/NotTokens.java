@@ -10,6 +10,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -52,6 +53,9 @@ public final class NotTokens extends JavaPlugin implements CommandExecutor, List
      * papi now supports offline players x
      *
      * add papi placeholders for top 10 nottokens_top_<x>
+     *
+     * kill rewards for all mobs
+     * add a chance for mobs to drop
      */
 
     File tokensHolder = new File(this.getDataFolder() + File.separator + "tokensHolder.yml");
@@ -63,7 +67,10 @@ public final class NotTokens extends JavaPlugin implements CommandExecutor, List
     SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy");
     SimpleDateFormat formatExact = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
     File today = new File(records + File.separator + format.format(now) + ".txt");
-    Map<EntityType, Long> tokenRewards = new HashMap<>();
+    public List<TokenRewards> tokenRewards = new ArrayList<>();
+    public int allMobReward;
+    public double allMobRate;
+    public boolean allMobRewardEnabled;
     public ArrayList<String> transactions = new ArrayList<>();
     public int condenseSpam;
     Map<String, Long> lastTokenMessage = new HashMap<>();
@@ -313,9 +320,20 @@ public final class NotTokens extends JavaPlugin implements CommandExecutor, List
         if (!this.getConfig().isSet("database.auto-connect")){
             this.getConfig().set("database.auto-connect", false);
         }
+        if (!this.getConfig().isSet("kill-rewards.all-mobs.enabled")){
+            this.getConfig().set("kill-rewards.all-mobs.enabled", false);
+        }
+        if (!this.getConfig().isSet("kill-rewards.all-mobs.amount")){
+            this.getConfig().set("kill-rewards.all-mobs.amount", 1);
+        }
+        if (!this.getConfig().isSet("kill-rewards.all-mobs.rate")){
+            this.getConfig().set("kill-rewards.all-mobs.rate", 0.1);
+        }
         this.saveConfig();
 
-
+        allMobRewardEnabled = this.getConfig().getBoolean("kill-rewards.all-mobs.enabled");
+        allMobReward = this.getConfig().getInt("kill-rewards.all-mobs.amount");
+        allMobRate = this.getConfig().getDouble("kill-rewards.all-mobs.rate");
 
         language.clear();
 
@@ -360,10 +378,14 @@ public final class NotTokens extends JavaPlugin implements CommandExecutor, List
             int i = 1;
             while (this.getConfig().getString("kill-rewards." + i + ".name") != null) {
                 String key = this.getConfig().getString("kill-rewards." + i + ".name");
-                long tokenAmount = this.getConfig().getLong("kill-rewards." + i + ".amount");
+                int tokenAmount = this.getConfig().getInt("kill-rewards." + i + ".amount");
+                double rate = 1;
+                if (this.getConfig().isSet("kill-rewards." + i + ".rate")){
+                    rate = this.getConfig().getDouble("kill-rewards." + i + ".rate");
+                }
                 EntityType entityType = getEntityByName(key);
                 if (entityType != null) {
-                    tokenRewards.put(entityType, tokenAmount);
+                    tokenRewards.add(new TokenRewards(entityType, tokenAmount, rate));
                 } else {
                     Bukkit.getLogger().warning("Could not find entity type for \"" + key + "\".");
                 }
@@ -935,11 +957,22 @@ public final class NotTokens extends JavaPlugin implements CommandExecutor, List
 
     @EventHandler
     public void onEntityDeath(EntityDeathEvent event){
-        if (tokenRewards.containsKey(event.getEntity().getType())){
-            long tokens = tokenRewards.get(event.getEntity().getType());
-            if (event.getEntity().getKiller() != null){
-                addTokens(event.getEntity().getKiller(), tokens);
-                transactions.add("[" +formatExact.format(now) + "] " + event.getEntity().getKiller().getName() + " has received " + tokens + " tokens from killing " + event.getEntity().getName() + ". Total:" + getTokens(event.getEntity().getKiller().getUniqueId()));
+        for (TokenRewards rewards : tokenRewards){
+            if (rewards.getType().equals(event.getEntity().getType())){
+                if (rewards.drop())
+                    if (event.getEntity().getKiller() != null){
+                        addTokens(event.getEntity().getKiller(), rewards.getAmount());
+                        transactions.add("[" +formatExact.format(now) + "] " + event.getEntity().getKiller().getName() + " has received " + rewards.getAmount() + " tokens from killing " + event.getEntity().getName() + ". Total:" + getTokens(event.getEntity().getKiller().getUniqueId()));
+                    }
+                return;
+            }
+        }
+        if (allMobRewardEnabled){
+            if (Math.random() <= allMobRate){
+                if (event.getEntity().getKiller() != null){
+                    addTokens(event.getEntity().getKiller(), allMobReward);
+                    transactions.add("[" +formatExact.format(now) + "] " + event.getEntity().getKiller().getName() + " has received " + allMobReward + " tokens from killing " + event.getEntity().getName() + ". Total:" + getTokens(event.getEntity().getKiller().getUniqueId()));
+                }
             }
         }
     }

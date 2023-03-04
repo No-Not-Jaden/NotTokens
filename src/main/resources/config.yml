@@ -39,48 +39,67 @@ admin-give-all: '&aYou have given {amount} players {tokens} tokens.'
 
 # Placeholder: %nottokens_amount%
 
-# how many tokens are rewarded for killing a mob
+# how many tokens are rewarded for killing a mob and the rate the will drop
 kill-rewards:
   enabled: false
+  all-mobs:
+    enabled: false
+    amount: 1
+    rate: 0.1
+  # manually adding mobs overrides all-mobs rate and amount
   1:
     name: zombie
     amount: 1
+    rate: 0.1
   2:
     name: skeleton
     amount: 1
+    rate: 0.1
   3:
     name: spider
     amount: 1
+    rate: 0.1
   4:
     name: witch
     amount: 3
+    rate: 0.1
   5:
     name: creeper
     amount: 1
+    rate: 0.1
   6:
     name: wither
     amount: 500
+    rate: 0.1
   7:
     name: ender_dragon
     amount: 500
+    rate: 0.1
   8:
     name: elder_guardian
     amount: 500
+    rate: 0.1
   9:
     name: iron_golem
     amount: 5
+    rate: 0.1
   10:
     name: wither_skeleton
     amount: 2
+    rate: 0.1
   11:
     name: cave_spider
     amount: 1
+    rate: 0.1
   12:
     name: drowned
     amount: 2
+    rate: 0.1
   13:
     name: blaze
     amount: 1
+    rate: 0.1
   14:
     name: zombified_piglin
     amount: 1
+    rate: 0.1
