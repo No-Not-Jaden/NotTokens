@@ -8,6 +8,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -732,7 +733,23 @@ public final class NotTokens extends JavaPlugin implements CommandExecutor, List
                 } else if (args[0].equalsIgnoreCase("top")) {
                     displayTopTokens(sender);
                     return true;
-                } else {
+                } else if (args[0].equalsIgnoreCase("migrate")){
+                    if (args.length == 1){
+                        // migrate notTokens data to sql
+
+                    } else {
+                        if (args[1].equalsIgnoreCase("tokenManager")){
+                            if (!Bukkit.getPluginManager().isPluginEnabled("TokenManager")){
+                                // plugin not found
+                                sender.sendMessage(prefix + "Plugin not found!");
+                                return true;
+                            }
+
+                            FileConfiguration config = Bukkit.getPluginManager().getPlugin("TokenManager").getConfig();
+                        }
+                    }
+                }
+                else {
                     Player p = Bukkit.getPlayer(args[0]);
                     if (p == null){
                         if (loggedPlayers.containsKey(args[0].toLowerCase(Locale.ROOT))) {
