@@ -47,7 +47,7 @@ public class Tokens extends PlaceholderExpansion {
         }
         // %example_placeholder1%
         if(identifier.equals("amount")){
-            return plugin.getTokens(player.getUniqueId()) + "";
+            return TokenManager.getTokens(player.getUniqueId()) + "";
         }
 
         // %example_placeholder2%
