@@ -157,6 +157,7 @@ public class SQLGetter {
         return 0;
     }
 
+
     public boolean reconnect(){
         SQL.disconnect();
         Bukkit.getLogger().warning("Lost connection with database, will try to reconnect.");

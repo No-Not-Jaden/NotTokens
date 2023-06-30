@@ -214,6 +214,10 @@ public class Commands implements CommandExecutor, TabCompleter {
                                         sender.sendMessage(ChatColor.YELLOW + "/token remove (player) (amount)" + ChatColor.GOLD + " Removes a player's tokens");
                                     }
                                     if (number != -1) {
+                                        if (getTokens(player.getUniqueId()) - number < 0){
+                                            sender.sendMessage(prefix + ChatColor.RED + "Player does not have that many tokens!");
+                                            return true;
+                                        }
                                         removeTokens(player, number);
                                         transactions.add("[" + formatExact.format(now) + "] " + name + " has had " + number + " tokens removed from " + sender.getName() + ". Total:" + getTokens(player.getUniqueId()));
                                         String text = language.get(3);
@@ -333,6 +337,7 @@ public class Commands implements CommandExecutor, TabCompleter {
                     displayTopTokens(sender);
                     return true;
                 } else if (args[0].equalsIgnoreCase("migrate")){
+                    /*
                     // maybe add an "are you sure?"
                     if (args.length == 1){
                         // migrate notTokens data to sql
@@ -422,6 +427,8 @@ public class Commands implements CommandExecutor, TabCompleter {
                         // usage
                         sender.sendMessage(prefix + ChatColor.AQUA + "/tokens migrate (plugin) (DELETE/MAINTAIN/UPDATE)");
                     }
+
+                     */
                 }
                 else {
                     Player p = Bukkit.getPlayer(args[0]);
@@ -591,6 +598,10 @@ public class Commands implements CommandExecutor, TabCompleter {
                             autoComplete.add(player.getName());
                         }
                     }
+
+                }
+            } else if (args.length == 3){
+                if (sender.hasPermission("nottokens.admin")){
                     if (args[0].equalsIgnoreCase("giveall")){
                         autoComplete.add("online");
                         autoComplete.add("offline");
