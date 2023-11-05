@@ -17,6 +17,8 @@ database:
 # condense the tokens notifications to one message per given seconds
 # time in seconds (-1 to disable)
 condense-spam: 30
+# allow players to have negative tokens
+negative-tokens: false
 # a list of players that are excluded from /tokens top
 # not case-sensitive
 leaderboard-exclusion:
@@ -36,6 +38,7 @@ unknown-player: '&cUnknown Player!'
 reduced-message: '&aYour tokens have changed by {tokens} in the last {time} seconds.'
 other-tokens: '&a{player} has {tokens} tokens.'
 admin-give-all: '&aYou have given {amount} players {tokens} tokens.'
+insufficient-tokens: '&cYou do not have enough tokens for this transaction!'
 
 # Placeholder: %nottokens_amount%
 

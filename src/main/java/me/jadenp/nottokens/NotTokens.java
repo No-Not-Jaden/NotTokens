@@ -75,8 +75,8 @@ public final class NotTokens extends JavaPlugin {
         if (!tokensHolder.exists()) {
             try {
                 tokensHolder.createNewFile();
-            } catch (IOException ex) {
-                ex.printStackTrace();
+            } catch (IOException e) {
+                Bukkit.getLogger().warning(e.toString());
             }
 
         } else {
@@ -101,7 +101,7 @@ public final class NotTokens extends JavaPlugin {
             try {
                 today.createNewFile();
             } catch (IOException e) {
-                e.printStackTrace();
+                Bukkit.getLogger().warning(e.toString());
             }
         } else {
             try {
@@ -112,7 +112,7 @@ public final class NotTokens extends JavaPlugin {
                 }
                 scanner.close();
             } catch (FileNotFoundException e) {
-                e.printStackTrace();
+                Bukkit.getLogger().warning(e.toString());
             }
         }
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
@@ -135,7 +135,7 @@ public final class NotTokens extends JavaPlugin {
                 try {
                     saveTokens();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    Bukkit.getLogger().warning(e.toString());
                 }
 
             }
@@ -168,7 +168,7 @@ public final class NotTokens extends JavaPlugin {
                                 if (text.contains("{time}")) {
                                     text = text.replace("{time}", condenseSpam + "");
                                 }
-                                p.sendMessage(prefix + color(text));
+                                p.sendMessage(prefix + color(text, p));
                                 tokenChangeQueue.replace(p.getUniqueId().toString(), new ArrayList<>());
                                 lastTokenMessage.replace(p.getUniqueId().toString(), System.currentTimeMillis());
                             }
@@ -188,7 +188,7 @@ public final class NotTokens extends JavaPlugin {
         try {
             saveTokens();
         } catch (IOException e) {
-            e.printStackTrace();
+            Bukkit.getLogger().warning(e.toString());
         }
 
         SQL.disconnect();

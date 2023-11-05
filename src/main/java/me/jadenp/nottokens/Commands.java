@@ -1,6 +1,5 @@
 package me.jadenp.nottokens;
 
-import me.jadenp.nottokens.sql.MySQL;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -8,23 +7,15 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static me.jadenp.nottokens.ConfigOptions.*;
-import static me.jadenp.nottokens.ConfigOptions.excludedNames;
 import static me.jadenp.nottokens.TokenManager.*;
 
 public class Commands implements CommandExecutor, TabCompleter {
@@ -40,17 +31,20 @@ public class Commands implements CommandExecutor, TabCompleter {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (command.getName().equalsIgnoreCase("token")) {
             if (sender.hasPermission("nottokens.admin")) {
+                OfflinePlayer parser = null;
+                if (sender instanceof Player)
+                    parser = (Player) sender;
                 if (args.length == 0) {
                     String text = language.get(0);
-                    if (text.contains("{tokens}"))
+                    if (text.contains("{tokens}") && sender instanceof Player)
                         text = text.replace("{tokens}", getTokens(((Player) sender).getUniqueId()) + "");
-                    sender.sendMessage(prefix + color(text));
+                    sender.sendMessage(prefix + color(text, parser));
                 } else if (args[0].equalsIgnoreCase("reload")) {
                     loadConfig();
                     try {
                         NotTokens.getInstance().saveTokens();
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        Bukkit.getLogger().warning(e.toString());
                     }
                     sender.sendMessage(prefix + ChatColor.GREEN + "Reloaded NotTokens version " + NotTokens.getInstance().getDescription().getVersion() + ".");
                 } else if (args[0].equalsIgnoreCase("help")) {
@@ -75,7 +69,7 @@ public class Commands implements CommandExecutor, TabCompleter {
                                 if (args.length >= 3) {
                                     long number = -1;
                                     try {
-                                        number = Long.parseLong(args[2]);
+                                        number = (long) Double.parseDouble(args[2]);
                                     } catch (NumberFormatException e) {
                                         sender.sendMessage(prefix + ChatColor.GREEN + "Usage: ");
                                         sender.sendMessage(ChatColor.YELLOW + "/token give (player) (amount)" + ChatColor.GOLD + " Gives a player tokens");
@@ -90,7 +84,7 @@ public class Commands implements CommandExecutor, TabCompleter {
                                         if (text.contains("{tokens")) {
                                             text = text.replace("{tokens}", number + "");
                                         }
-                                        sender.sendMessage(prefix + color(text));
+                                        sender.sendMessage(prefix + color(text, parser));
 
                                     }
                                 } else {
@@ -98,13 +92,13 @@ public class Commands implements CommandExecutor, TabCompleter {
                                     sender.sendMessage(ChatColor.YELLOW + "/token give (player) (amount)" + ChatColor.GOLD + " Gives a player tokens");
                                 }
                             } else {
-                                sender.sendMessage(prefix + color(language.get(6)));
+                                sender.sendMessage(prefix + color(language.get(6), parser));
                             }
                         } else {
                             if (args.length >= 3) {
                                 long number = -1;
                                 try {
-                                    number = Long.parseLong(args[2]);
+                                    number = (long) Double.parseDouble(args[2]);
                                 } catch (NumberFormatException e) {
                                     sender.sendMessage(prefix + ChatColor.GREEN + "Usage: ");
                                     sender.sendMessage(ChatColor.YELLOW + "/token give (player) (amount)" + ChatColor.GOLD + " Gives a player tokens");
@@ -119,7 +113,7 @@ public class Commands implements CommandExecutor, TabCompleter {
                                     if (text.contains("{tokens")) {
                                         text = text.replace("{tokens}", number + "");
                                     }
-                                    sender.sendMessage(prefix + color(text));
+                                    sender.sendMessage(prefix + color(text, parser));
 
                                 }
                             } else {
@@ -137,7 +131,7 @@ public class Commands implements CommandExecutor, TabCompleter {
                             if (args[2].equalsIgnoreCase("offline")){
                                 long number = -1;
                                 try {
-                                    number = Long.parseLong(args[1]);
+                                    number = (long) Double.parseDouble(args[1]);
                                 } catch (NumberFormatException e) {
                                     sender.sendMessage(prefix + ChatColor.GREEN + "Usage: ");
                                     sender.sendMessage(ChatColor.YELLOW + "/token giveall (amount) (online/offline)" + ChatColor.GOLD + " Gives all offline or online players tokens");
@@ -165,14 +159,14 @@ public class Commands implements CommandExecutor, TabCompleter {
                                     if (text.contains("{tokens}")) {
                                         text = text.replace("{tokens}", number + "");
                                     }
-                                    sender.sendMessage(prefix + color(text));
+                                    sender.sendMessage(prefix + color(text, parser));
                                     return true;
                                 }
                             }
                         }
                         long number = -1;
                         try {
-                            number = Long.parseLong(args[1]);
+                            number = (long) Double.parseDouble(args[1]);
                         } catch (NumberFormatException e) {
                             sender.sendMessage(prefix + ChatColor.GREEN + "Usage: ");
                             sender.sendMessage(ChatColor.YELLOW + "/token giveall (amount) (online/offline)" + ChatColor.GOLD + " Gives all offline or online players tokens");
@@ -191,7 +185,7 @@ public class Commands implements CommandExecutor, TabCompleter {
                             if (text.contains("{tokens}")) {
                                 text = text.replace("{tokens}", number + "");
                             }
-                            sender.sendMessage(prefix + color(text));
+                            sender.sendMessage(prefix + color(text, parser));
                             return true;
                         }
                     } else {
@@ -208,17 +202,16 @@ public class Commands implements CommandExecutor, TabCompleter {
                                 if (args.length >= 3) {
                                     long number = -1;
                                     try {
-                                        number = Long.parseLong(args[2]);
+                                        number = (long) Double.parseDouble(args[2]);
                                     } catch (NumberFormatException e) {
                                         sender.sendMessage(prefix + ChatColor.GREEN + "Usage: ");
                                         sender.sendMessage(ChatColor.YELLOW + "/token remove (player) (amount)" + ChatColor.GOLD + " Removes a player's tokens");
                                     }
                                     if (number != -1) {
-                                        if (getTokens(player.getUniqueId()) - number < 0){
+                                        if (!removeTokens(player, number)){
                                             sender.sendMessage(prefix + ChatColor.RED + "Player does not have that many tokens!");
                                             return true;
                                         }
-                                        removeTokens(player, number);
                                         transactions.add("[" + formatExact.format(now) + "] " + name + " has had " + number + " tokens removed from " + sender.getName() + ". Total:" + getTokens(player.getUniqueId()));
                                         String text = language.get(3);
                                         if (text.contains("{player}")) {
@@ -227,27 +220,30 @@ public class Commands implements CommandExecutor, TabCompleter {
                                         if (text.contains("{tokens}")) {
                                             text = text.replace("{tokens}", number + "");
                                         }
-                                        sender.sendMessage(prefix + color(text));
+                                        sender.sendMessage(prefix + color(text, parser));
                                     }
                                 } else {
                                     sender.sendMessage(prefix + ChatColor.GREEN + "Usage: ");
                                     sender.sendMessage(ChatColor.YELLOW + "/token remove (player) (amount)" + ChatColor.GOLD + " Removes a player's tokens");
                                 }
                             } else {
-                                sender.sendMessage(prefix + color(language.get(6)));
+                                sender.sendMessage(prefix + color(language.get(6), parser));
                             }
 
                         } else {
                             if (args.length >= 3) {
                                 long number = -1;
                                 try {
-                                    number = Long.parseLong(args[2]);
+                                    number = (long) Double.parseDouble(args[2]);
                                 } catch (NumberFormatException e) {
                                     sender.sendMessage(prefix + ChatColor.GREEN + "Usage: ");
                                     sender.sendMessage(ChatColor.YELLOW + "/token remove (player) (amount)" + ChatColor.GOLD + " Removes a player's tokens");
                                 }
                                 if (number != -1) {
-                                    removeTokens(p, number);
+                                    if (!removeTokens(p, number)) {
+                                        sender.sendMessage(prefix + ChatColor.RED + "Player does not have that many tokens!");
+                                        return true;
+                                    }
                                     transactions.add("[" + formatExact.format(now) + "] " + p.getName() + " has had " + number + " tokens removed from " + sender.getName() + ". Total:" + getTokens(p.getUniqueId()));
                                     String text = language.get(3);
                                     if (text.contains("{player}")) {
@@ -256,7 +252,7 @@ public class Commands implements CommandExecutor, TabCompleter {
                                     if (text.contains("{tokens}")) {
                                         text = text.replace("{tokens}", number + "");
                                     }
-                                    sender.sendMessage(prefix + color(text));
+                                    sender.sendMessage(prefix + color(text, parser));
                                 }
                             } else {
                                 sender.sendMessage(prefix + ChatColor.GREEN + "Usage: ");
@@ -277,7 +273,7 @@ public class Commands implements CommandExecutor, TabCompleter {
                                 if (args.length >= 3) {
                                     long number = -1;
                                     try {
-                                        number = Long.parseLong(args[2]);
+                                        number = (long) Double.parseDouble(args[2]);
                                     } catch (NumberFormatException e) {
                                         sender.sendMessage(prefix + ChatColor.GREEN + "Usage: ");
                                         sender.sendMessage(ChatColor.YELLOW + "/token set (player) (amount)" + ChatColor.GOLD + " Sets a player's tokens");
@@ -292,7 +288,7 @@ public class Commands implements CommandExecutor, TabCompleter {
                                         if (text.contains("{tokens}")) {
                                             text = text.replace("{tokens}", number + "");
                                         }
-                                        sender.sendMessage(prefix + color(text));
+                                        sender.sendMessage(prefix + color(text, parser));
 
                                     }
                                 } else {
@@ -300,13 +296,13 @@ public class Commands implements CommandExecutor, TabCompleter {
                                     sender.sendMessage(ChatColor.YELLOW + "/token set (player) (amount)" + ChatColor.GOLD + " Sets a player's tokens");
                                 }
                             } else {
-                                sender.sendMessage(prefix + color(language.get(6)));
+                                sender.sendMessage(prefix + color(language.get(6), parser));
                             }
                         } else {
                             if (args.length >= 3) {
                                 long number = -1;
                                 try {
-                                    number = Long.parseLong(args[2]);
+                                    number =(long) Double.parseDouble(args[2]);
                                 } catch (NumberFormatException e) {
                                     sender.sendMessage(prefix + ChatColor.GREEN + "Usage: ");
                                     sender.sendMessage(ChatColor.YELLOW + "/token set (player) (amount)" + ChatColor.GOLD + " Sets a player's tokens");
@@ -321,7 +317,7 @@ public class Commands implements CommandExecutor, TabCompleter {
                                     if (text.contains("{tokens}")) {
                                         text = text.replace("{tokens}", number + "");
                                     }
-                                    sender.sendMessage(prefix + color(text));
+                                    sender.sendMessage(prefix + color(text, parser));
 
                                 }
                             } else {
@@ -443,9 +439,9 @@ public class Commands implements CommandExecutor, TabCompleter {
                             if (text.contains("{tokens")) {
                                 text = text.replace("{tokens}", getTokens(player.getUniqueId()) + "");
                             }
-                            sender.sendMessage(prefix + color(text));
+                            sender.sendMessage(prefix + color(text, parser));
                         } else {
-                            sender.sendMessage(prefix + color(language.get(6)));
+                            sender.sendMessage(prefix + color(language.get(6), parser));
                         }
                     } else {
                         String text = language.get(10);
@@ -455,7 +451,7 @@ public class Commands implements CommandExecutor, TabCompleter {
                         if (text.contains("{tokens")) {
                             text = text.replace("{tokens}", getTokens(p.getUniqueId()) + "");
                         }
-                        sender.sendMessage(prefix + color(text));
+                        sender.sendMessage(prefix + color(text, parser));
                     }
                 }
             } else {
@@ -468,9 +464,10 @@ public class Commands implements CommandExecutor, TabCompleter {
                     }
                 }
                 String text = language.get(0);
-                if (text.contains("{tokens}"))
+                if (text.contains("{tokens}") && sender instanceof Player) {
                     text = text.replace("{tokens}", getTokens(((Player) sender).getUniqueId()) + "");
-                sender.sendMessage(prefix + color(text));
+                    sender.sendMessage(prefix + color(text, (Player) sender));
+                }
             }
         }
 
@@ -522,19 +519,7 @@ public class Commands implements CommandExecutor, TabCompleter {
             }
 
             for (int i = 0; i < actualTop.size(); i++){
-                String name = "???";
-                OfflinePlayer player = actualTop.get(i).getOfflinePlayer();
-                if (player.getName() == null){
-                    if (loggedPlayers.containsValue(player.getUniqueId().toString())){
-                        for (Map.Entry<String, String> entry : loggedPlayers.entrySet()){
-                            if (entry.getValue().equals(player.getUniqueId().toString())){
-                                name = entry.getKey();
-                            }
-                        }
-                    }
-                } else {
-                    name = player.getName();
-                }
+                String name = getName(actualTop, i);
                 sender.sendMessage(ChatColor.GOLD + "" + (i + 1) + ". " + ChatColor.AQUA + name + ChatColor.DARK_GRAY + " > " + ChatColor.LIGHT_PURPLE + actualTop.get(i).getTokens());
             }
 
@@ -572,6 +557,23 @@ public class Commands implements CommandExecutor, TabCompleter {
             }
         }
         sender.sendMessage(ChatColor.DARK_GRAY + "" + ChatColor.STRIKETHROUGH + "                                              ");
+    }
+
+    private static String getName(List<TokenPlayer> actualTop, int i) {
+        String name = "???";
+        OfflinePlayer player = actualTop.get(i).getOfflinePlayer();
+        if (player.getName() == null){
+            if (loggedPlayers.containsValue(player.getUniqueId().toString())){
+                for (Map.Entry<String, String> entry : loggedPlayers.entrySet()){
+                    if (entry.getValue().equals(player.getUniqueId().toString())){
+                        name = entry.getKey();
+                    }
+                }
+            }
+        } else {
+            name = player.getName();
+        }
+        return name;
     }
 
     @Nullable

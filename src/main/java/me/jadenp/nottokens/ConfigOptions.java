@@ -1,9 +1,11 @@
 package me.jadenp.nottokens;
 
+import me.clip.placeholderapi.PlaceholderAPI;
 import me.jadenp.nottokens.sql.MySQL;
 import me.jadenp.nottokens.sql.SQLGetter;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.EntityType;
@@ -38,6 +40,8 @@ public class ConfigOptions {
     private static boolean firstStart = true;
     public static MySQL SQL;
     public static SQLGetter data;
+    public static boolean negativeTokens;
+    public static boolean papiEnabled;
 
 
     public static Map<String, String> loggedPlayers = new HashMap<>();
@@ -45,99 +49,69 @@ public class ConfigOptions {
     public static void loadConfig(){
         Plugin plugin = NotTokens.getInstance();
 
+        papiEnabled = Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI");
+
         plugin.reloadConfig();
 
         // adding parts to config if they are missing
-        if (plugin.getConfig().get("kill-rewards.enabled") == null){
+        if (plugin.getConfig().get("kill-rewards.enabled") == null)
             plugin.getConfig().set("kill-rewards.enabled", false);
-        }
-        if (!plugin.getConfig().isSet("condense-spam")){
-            plugin.getConfig().set("condense-spam", -1);
-        }
-        if (!plugin.getConfig().isSet("leaderboard-exclusion")){
+        if (!plugin.getConfig().isSet("condense-spam")) plugin.getConfig().set("condense-spam", -1);
+        if (!plugin.getConfig().isSet("leaderboard-exclusion"))
             plugin.getConfig().set("leaderboard-exclusion", Collections.emptyList());
-        }
-        if (!plugin.getConfig().isSet("prefix")){
-            plugin.getConfig().set("prefix", "&7[&b&lNot&d&lTokens&7] &8➟ &r");
-        }
-        if (!plugin.getConfig().isSet("balance")){
-            plugin.getConfig().set("balance", "&aYou have {tokens} tokens.");
-        }
-        if (!plugin.getConfig().isSet("admin-add")){
+        if (!plugin.getConfig().isSet("prefix")) plugin.getConfig().set("prefix", "&7[&b&lNot&d&lTokens&7] &8➟ &r");
+        if (!plugin.getConfig().isSet("balance")) plugin.getConfig().set("balance", "&aYou have {tokens} tokens.");
+        if (!plugin.getConfig().isSet("admin-add"))
             plugin.getConfig().set("admin-add", "&aYou have given {player} {tokens} tokens.");
-        }
-        if (!plugin.getConfig().isSet("player-receive")){
+        if (!plugin.getConfig().isSet("player-receive"))
             plugin.getConfig().set("player-receive", "&aYou have received {tokens} tokens.");
-        }
-        if (!plugin.getConfig().isSet("admin-remove")){
+        if (!plugin.getConfig().isSet("admin-remove"))
             plugin.getConfig().set("admin-remove", "&aYou have removed {tokens} tokens from {player}.");
-        }
-        if (!plugin.getConfig().isSet("player-take")){
+        if (!plugin.getConfig().isSet("player-take"))
             plugin.getConfig().set("player-take", "&a{tokens} tokens have been removed from your account.");
-        }
-        if (!plugin.getConfig().isSet("admin-set")){
+        if (!plugin.getConfig().isSet("admin-set"))
             plugin.getConfig().set("admin-set", "&a{player} now has {tokens} tokens.");
-        }
-        if (!plugin.getConfig().isSet("player-set")){
+        if (!plugin.getConfig().isSet("player-set"))
             plugin.getConfig().set("player-set", "&aYour tokens were set to {tokens}.");
-        }
-        if (!plugin.getConfig().isSet("unknown-command")){
+        if (!plugin.getConfig().isSet("unknown-command"))
             plugin.getConfig().set("unknown-command", "&cUnknown Command! /token help");
-        }
-        if (!plugin.getConfig().isSet("unknown-player")){
-            plugin.getConfig().set("unknown-player", "&cUnknown Player!");
-        }
-        if (!plugin.getConfig().isSet("reduced-message")){
+        if (!plugin.getConfig().isSet("unknown-player")) plugin.getConfig().set("unknown-player", "&cUnknown Player!");
+        if (!plugin.getConfig().isSet("reduced-message"))
             plugin.getConfig().set("reduced-message", "&aYour tokens have changed by {tokens} in the last {time} seconds.");
-        }
-        if (!plugin.getConfig().isSet("other-tokens")){
+        if (!plugin.getConfig().isSet("other-tokens"))
             plugin.getConfig().set("other-tokens", "&a{player} has {tokens} tokens.");
-        }
-        if (!plugin.getConfig().isSet("database.host")){
-            plugin.getConfig().set("database.host", "localhost");
-        }
-        if (!plugin.getConfig().isSet("database.port")){
-            plugin.getConfig().set("database.port", "3306");
-        }
-        if (!plugin.getConfig().isSet("database.database")){
-            plugin.getConfig().set("database.database", "db");
-        }
-        if (!plugin.getConfig().isSet("database.user")){
-            plugin.getConfig().set("database.user", "username");
-        }
-        if (!plugin.getConfig().isSet("database.password")){
-            plugin.getConfig().set("database.password", "");
-        }
-        if (!plugin.getConfig().isSet("database.use-ssl")){
-            plugin.getConfig().set("database.use-ssl", false);
-        }
-        if (!plugin.getConfig().isSet("database.migrate-local-data")){
+        if (!plugin.getConfig().isSet("database.host")) plugin.getConfig().set("database.host", "localhost");
+        if (!plugin.getConfig().isSet("database.port")) plugin.getConfig().set("database.port", "3306");
+        if (!plugin.getConfig().isSet("database.database")) plugin.getConfig().set("database.database", "db");
+        if (!plugin.getConfig().isSet("database.user")) plugin.getConfig().set("database.user", "username");
+        if (!plugin.getConfig().isSet("database.password")) plugin.getConfig().set("database.password", "");
+        if (!plugin.getConfig().isSet("database.use-ssl")) plugin.getConfig().set("database.use-ssl", false);
+        if (!plugin.getConfig().isSet("database.migrate-local-data"))
             plugin.getConfig().set("database.migrate-local-data", true);
-        }
-        if (!plugin.getConfig().isSet("admin-give-all")){
+        if (!plugin.getConfig().isSet("admin-give-all"))
             plugin.getConfig().set("admin-give-all", "&aYou have given {amount} players {tokens} tokens.");
-        }
-        if (!plugin.getConfig().isSet("database.auto-connect")){
-            plugin.getConfig().set("database.auto-connect", false);
-        }
-        if (!plugin.getConfig().isSet("kill-rewards.all-mobs.enabled")){
+        if (!plugin.getConfig().isSet("database.auto-connect")) plugin.getConfig().set("database.auto-connect", false);
+        if (!plugin.getConfig().isSet("kill-rewards.all-mobs.enabled"))
             plugin.getConfig().set("kill-rewards.all-mobs.enabled", false);
-        }
-        if (!plugin.getConfig().isSet("kill-rewards.all-mobs.amount")){
+        if (!plugin.getConfig().isSet("kill-rewards.all-mobs.amount"))
             plugin.getConfig().set("kill-rewards.all-mobs.amount", 1);
-        }
-        if (!plugin.getConfig().isSet("kill-rewards.all-mobs.rate")){
+        if (!plugin.getConfig().isSet("kill-rewards.all-mobs.rate"))
             plugin.getConfig().set("kill-rewards.all-mobs.rate", 0.1);
-        }
+        if (!plugin.getConfig().isSet("negative-tokens"))
+            plugin.getConfig().set("negative-tokens", false);
+        if (!plugin.getConfig().isSet("insufficient-tokens"))
+            plugin.getConfig().set("insufficient-tokens", "&cYou do not have enough tokens for this transaction!");
         plugin.saveConfig();
 
         allMobRewardEnabled = plugin.getConfig().getBoolean("kill-rewards.all-mobs.enabled");
         allMobReward = plugin.getConfig().getInt("kill-rewards.all-mobs.amount");
         allMobRate = plugin.getConfig().getDouble("kill-rewards.all-mobs.rate");
+        condenseSpam = plugin.getConfig().getInt("condense-spam");
+        negativeTokens = plugin.getConfig().getBoolean("negative-tokens");
 
         language.clear();
 
-        prefix = color(plugin.getConfig().getString("prefix"));
+        prefix = color(plugin.getConfig().getString("prefix"), null);
         //0 balance
         language.add(plugin.getConfig().getString("balance"));
         //1 admin-add
@@ -162,13 +136,10 @@ public class ConfigOptions {
         language.add(plugin.getConfig().getString("other-tokens"));
         //11 admin-give-all
         language.add(plugin.getConfig().getString("admin-give-all"));
+        //12 insufficient-tokens
+        language.add(plugin.getConfig().getString("insufficient-tokens"));
 
-        if (plugin.getConfig().getConfigurationSection("").getKeys(false).contains("condense-spam")){
-            condenseSpam = plugin.getConfig().getInt("condense-spam");
-        } else {
-            condenseSpam = -1;
-            Bukkit.getLogger().warning("No option found in the config for \"condense-spam\"! Outdated config?");
-        }
+
 
         excludedNames = plugin.getConfig().getStringList("leaderboard-exclusion");
         excludedNames.replaceAll(str -> str.toUpperCase(Locale.ROOT));
@@ -222,7 +193,7 @@ public class ConfigOptions {
             if (SQL.isConnected()) {
                 Bukkit.getLogger().info("Database is connected!");
                 data.createTable();
-                if (tokens.size() > 0 && migrateLocalData) {
+                if (!tokens.isEmpty() && migrateLocalData) {
                     Bukkit.getLogger().info("Migrating local storage to database");
                     // add entries to database
                     for (Map.Entry<String, Long> entry : tokens.entrySet()) {
@@ -234,7 +205,7 @@ public class ConfigOptions {
                     try {
                         configuration.save(NotTokens.getInstance().tokensHolder);
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        Bukkit.getLogger().warning(e.toString());
                     }
                 }
                 int rows = data.removeExtraData();
@@ -247,7 +218,9 @@ public class ConfigOptions {
         return true;
     }
 
-    public static String color(String str){
+    public static String color(String str, OfflinePlayer player){
+        if (papiEnabled)
+            str = PlaceholderAPI.setPlaceholders(player, str);
         str = ChatColor.translateAlternateColorCodes('&', str);
         return translateHexColorCodes("&#","", str);
     }

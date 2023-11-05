@@ -13,6 +13,7 @@ public class TokenManager {
     public static Map<String, List<Long>> tokenChangeQueue = new HashMap<>();
     public static Map<String, Long> tokens = new HashMap<>();
     public static List<TokenRewards> tokenRewards = new ArrayList<>();
+
     public static void addTokens(OfflinePlayer p, long amount){
         if (SQL.isConnected()){
             data.addTokens(p.getUniqueId(), amount);
@@ -23,25 +24,17 @@ public class TokenManager {
                 tokens.put(p.getUniqueId().toString(), amount);
             }
         }
-    }
 
-    public static void addTokens(Player p, long amount){
-        if (SQL.isConnected()){
-            data.addTokens(p.getUniqueId(), amount);
-        } else {
-            if (tokens.containsKey(p.getUniqueId().toString())) {
-                tokens.replace(p.getUniqueId().toString(), getTokens(p.getUniqueId()) + amount);
-            } else {
-                tokens.put(p.getUniqueId().toString(), amount);
-            }
-        }
-
+        if (!p.isOnline())
+            return;
+        Player player = p.getPlayer();
+        assert player != null;
         if (condenseSpam == -1){
             String text2 = language.get(2);
             if (text2.contains("{tokens}")) {
                 text2 = text2.replace("{tokens}", amount + "");
             }
-            p.sendMessage(prefix + color(text2));
+            player.sendMessage(prefix + color(text2, p));
         } else {
             if (lastTokenMessage.containsKey(p.getUniqueId().toString())) {
                 if (((System.currentTimeMillis() - lastTokenMessage.get(p.getUniqueId().toString())) > condenseSpam * 1000L)) {
@@ -49,7 +42,7 @@ public class TokenManager {
                     if (text2.contains("{tokens}")) {
                         text2 = text2.replace("{tokens}", amount + "");
                     }
-                    p.sendMessage(prefix + color(text2));
+                    player.sendMessage(prefix + color(text2, p));
                     lastTokenMessage.replace(p.getUniqueId().toString(), System.currentTimeMillis());
                 } else {
                     List<Long> changes;
@@ -68,7 +61,7 @@ public class TokenManager {
                 if (text2.contains("{tokens}")) {
                     text2 = text2.replace("{tokens}", amount + "");
                 }
-                p.sendMessage(prefix + color(text2));
+                player.sendMessage(prefix + color(text2, p));
                 lastTokenMessage.put(p.getUniqueId().toString(), System.currentTimeMillis());
             }
         }
@@ -84,27 +77,24 @@ public class TokenManager {
                 tokens.put(p.getUniqueId().toString(), amount);
             }
         }
-    }
 
-    public static void setTokens(Player p, long amount){
-        if (SQL.isConnected()){
-            data.setToken(p.getUniqueId(), amount);
-        } else {
-            if (tokens.containsKey(p.getUniqueId().toString())) {
-                tokens.replace(p.getUniqueId().toString(), amount);
-            } else {
-                tokens.put(p.getUniqueId().toString(), amount);
+        if (p.isOnline()) {
+            String text2 = language.get(8);
+            if (text2.contains("{tokens")) {
+                text2 = text2.replace("{tokens}", amount + "");
             }
+            Objects.requireNonNull(p.getPlayer()).sendMessage(prefix + color(text2, p));
         }
-
-        String text2 = language.get(8);
-        if (text2.contains("{tokens")) {
-            text2 = text2.replace("{tokens}", amount + "");
-        }
-        p.sendMessage(prefix + color(text2));
     }
 
-    public static void removeTokens(OfflinePlayer p, long amount){
+
+
+    public static boolean removeTokens(OfflinePlayer p, long amount){
+        if (!negativeTokens && getTokens(p.getUniqueId()) < amount) {
+            if (p.isOnline())
+                Objects.requireNonNull(p.getPlayer()).sendMessage(prefix + color(language.get(12), p));
+            return false;
+        }
         if (SQL.isConnected()){
             data.removeTokens(p.getUniqueId(), amount);
         } else {
@@ -114,24 +104,16 @@ public class TokenManager {
                 tokens.put(p.getUniqueId().toString(), -amount);
             }
         }
-    }
-
-    public static void removeTokens(Player p, long amount){
-        if (SQL.isConnected()){
-            data.removeTokens(p.getUniqueId(), amount);
-        } else {
-            if (tokens.containsKey(p.getUniqueId().toString())) {
-                tokens.replace(p.getUniqueId().toString(), getTokens(p.getUniqueId()) - amount);
-            } else {
-                tokens.put(p.getUniqueId().toString(), -amount);
-            }
-        }
+        if (!p.isOnline())
+            return true;
+        Player player = p.getPlayer();
+        assert player != null;
         if (condenseSpam == -1){
             String text2 = language.get(4);
             if (text2.contains("{tokens}")) {
                 text2 = text2.replace("{tokens}", amount + "");
             }
-            p.sendMessage(prefix + color(text2));
+            player.sendMessage(prefix + color(text2, p));
         } else {
             if (lastTokenMessage.containsKey(p.getUniqueId().toString())) {
                 if (((System.currentTimeMillis() - lastTokenMessage.get(p.getUniqueId().toString())) > condenseSpam * 1000L)) {
@@ -139,7 +121,7 @@ public class TokenManager {
                     if (text2.contains("{tokens}")) {
                         text2 = text2.replace("{tokens}", amount + "");
                     }
-                    p.sendMessage(prefix + color(text2));
+                    player.sendMessage(prefix + color(text2, p));
                     lastTokenMessage.replace(p.getUniqueId().toString(), System.currentTimeMillis());
                 } else {
                     List<Long> changes;
@@ -158,10 +140,11 @@ public class TokenManager {
                 if (text2.contains("{tokens}")) {
                     text2 = text2.replace("{tokens}", amount + "");
                 }
-                p.sendMessage(prefix + color(text2));
+                player.sendMessage(prefix + color(text2, p));
                 lastTokenMessage.put(p.getUniqueId().toString(), System.currentTimeMillis());
             }
         }
+        return true;
     }
 
     public static long getTokens(UUID uuid){
